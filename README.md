@@ -265,9 +265,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Project Maintainer**: [Your Name]
-- **Email**: [your.email@example.com]
-- **GitHub**: [@yourusername]
+- **Project Maintainer**: Ian Dave Cruz
+- **Email**: cdave,dev@gmail.com
+- **GitHub**: @N-Dave-08
 
 ## 🙏 Acknowledgments
 
