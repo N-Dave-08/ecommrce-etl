@@ -1,0 +1,20 @@
+{
+    "data_paths": {
+        "customers": "data/customers.csv",
+        "orders": "data/orders.csv"
+    },
+    "validation": {
+        "max_order_age_years": 10,
+        "min_total_amount": 0.01,
+        "email_validation": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "etl.log",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    },
+    "database": {
+        "backup_before_replace": true,
+        "create_tables_if_not_exist": true
+    }
+} 

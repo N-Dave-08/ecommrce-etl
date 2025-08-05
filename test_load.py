@@ -1,15 +1,15 @@
+from etl.load import load_to_mysql
 from etl.extract import extract_customers, extract_orders
 from etl.transform import clean_customers, clean_orders
-from etl.load import load_to_mysql
 
-# Extract
+# extract
 customers = extract_customers("data/customers.csv")
 orders = extract_orders("data/orders.csv")
 
-# Transform
+# transform
 customers_clean = clean_customers(customers)
-orders_clean = clean_orders(orders)
+orders_clean = clean_orders(orders, customers_clean)
 
-# Load
+# load
 load_to_mysql(customers_clean, "customers")
 load_to_mysql(orders_clean, "orders")
