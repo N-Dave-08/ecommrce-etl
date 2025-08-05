@@ -1,280 +1,373 @@
 # E-commerce ETL Pipeline
 
-A robust Python ETL (Extract, Transform, Load) pipeline designed to process e-commerce customer and order data from CSV files and load it into a MySQL database. This project provides a clean, modular architecture for data processing with comprehensive error handling and logging.
+A robust, production-ready ETL (Extract, Transform, Load) pipeline for processing e-commerce data from CSV files to MySQL database with comprehensive data validation, error handling, and logging.
 
-## 📋 Project Overview
+## 🎯 Features
 
-This ETL pipeline automates the process of:
-- **Extract**: Reading customer and order data from CSV files
-- **Transform**: Cleaning and standardizing data (email normalization, date parsing, validation)
-- **Load**: Storing processed data into MySQL database tables
-
-The pipeline is designed for reliability and maintainability, with separate modules for each ETL phase and comprehensive error handling.
-
-## 🛠 Tech Stack
-
-- **Python 3.8+**
-- **Pandas**: Data manipulation and analysis
-- **SQLAlchemy**: Database ORM and connection management
-- **PyMySQL**: MySQL database connector
-- **MySQL**: Target database system
+- **Comprehensive Data Validation**: Validates file existence, CSV structure, and data integrity
+- **Robust Error Handling**: Detailed logging and graceful error recovery
+- **Data Quality Checks**: Email validation, business logic validation, and duplicate removal
+- **Database Integration**: Secure MySQL connection with table creation and backup capabilities
+- **Configurable**: Centralized configuration management
+- **Testable**: Comprehensive unit tests included
+- **Production-Ready**: Proper exit codes, logging levels, and error recovery
 
 ## 📁 Project Structure
 
 ```
 e-commerce-etl/
 ├── config/
-│   └── db_config.json          # Database connection configuration
+│   ├── db_config.json      # Database connection settings
+│   └── etl_config.json     # ETL pipeline configuration
 ├── data/
-│   ├── customers.csv           # Source customer data
-│   └── orders.csv             # Source order data
+│   ├── customers.csv       # Customer data source
+│   └── orders.csv          # Order data source
 ├── etl/
-│   ├── extract.py             # Data extraction module
-│   ├── transform.py           # Data transformation module
-│   └── load.py               # Data loading module
-├── main.py                    # Main ETL orchestration script
-├── requirements.txt           # Python dependencies
-├── README.md                 # Project documentation
-└── test_*.py                 # Unit tests for each module
+│   ├── extract.py          # Data extraction functions
+│   ├── transform.py        # Data transformation and cleaning
+│   └── load.py            # Database loading functions
+├── tests/
+│   └── test_extract.py    # Unit tests
+├── main.py                # Main ETL pipeline
+├── requirements.txt        # Python dependencies
+└── README.md             # This file
 ```
 
-## 🚀 Setup Instructions
+## 🚀 Installation
 
-### Prerequisites
-
-1. **Python Environment**
-   - Python 3.8 or higher
-   - pip package manager
-
-2. **MySQL Database**
-   - MySQL Server 5.7+ or MySQL 8.0+
-   - MySQL client tools
-
-### Installation
-
-1. **Clone the repository**
+1. **Clone the repository**:
    ```bash
    git clone <repository-url>
    cd e-commerce-etl
    ```
 
-2. **Create and activate virtual environment**
+2. **Create virtual environment**:
    ```bash
-   # Windows
    python -m venv venv
-   venv\Scripts\activate
-
-   # macOS/Linux
-   python3 -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install dependencies**
+3. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-### Database Setup
-
-1. **Install MySQL Server**
-   - Download and install MySQL Server from [MySQL Downloads](https://dev.mysql.com/downloads/mysql/)
-   - Follow the installation wizard
-
-2. **Create Database**
-   ```sql
-   CREATE DATABASE ecommerce;
-   ```
-
-3. **Configure Database Connection**
-   Edit `config/db_config.json` with your MySQL credentials:
+4. **Configure database**:
+   Edit `config/db_config.json` with your MySQL connection details:
    ```json
    {
-     "user": "your_username",
-     "password": "your_password",
-     "host": "localhost",
-     "database": "ecommerce"
+       "user": "your_username",
+       "password": "your_password",
+       "host": "localhost",
+       "database": "ecommerce"
    }
    ```
 
-## ⚙️ Configuration
+## 🏃‍♂️ Usage
 
-### Database Credentials
+### Running the ETL Pipeline
 
-The pipeline uses a JSON configuration file for database connection settings:
-
-**File**: `config/db_config.json`
-```json
-{
-  "user": "your_username",
-  "password": "your_password", 
-  "host": "localhost",
-  "database": "ecommerce"
-}
-```
-
-**Security Note**: 
-- Never commit database credentials to version control
-- Consider using environment variables for production deployments
-- Add `config/db_config.json` to your `.gitignore` file
-
-## 🏃‍♂️ Running the ETL Pipeline
-
-### Quick Start
-
-Run the complete ETL pipeline:
 ```bash
 python main.py
 ```
 
-### Step-by-Step Execution
+The pipeline will:
+1. Extract data from CSV files with comprehensive validation
+2. Transform and clean the data with strict quality checks
+3. Load data to MySQL database with error handling
+4. Log all operations to `etl.log` and console
 
-You can also run individual ETL phases for debugging:
+### Running Tests
 
-1. **Extract Phase**
-   ```python
-   from etl.extract import extract_customers, extract_orders
-   
-   customers = extract_customers("data/customers.csv")
-   orders = extract_orders("data/orders.csv")
-   ```
+The project includes comprehensive unit tests organized in the `tests/` directory:
 
-2. **Transform Phase**
-   ```python
-   from etl.transform import clean_customers, clean_orders
-   
-   customers_clean = clean_customers(customers)
-   orders_clean = clean_orders(orders)
-   ```
+```bash
+# Run all tests
+python tests/run_tests.py
 
-3. **Load Phase**
-   ```python
-   from etl.load import load_to_mysql
-   
-   load_to_mysql(customers_clean, "customers")
-   load_to_mysql(orders_clean, "orders")
-   ```
+# Run specific test modules
+python -m unittest tests.test_extract
+python -m unittest tests.test_transform
+python -m unittest tests.test_load
+
+# Run simple integration tests
+python tests/test_extract_simple.py
+python tests/test_transform_simple.py
+python tests/test_load_simple.py
+```
+
+### Test Structure
+
+```
+tests/
+├── __init__.py              # Tests package
+├── run_tests.py             # Test runner with summary
+├── test_extract.py          # Comprehensive extract tests
+├── test_transform.py        # Comprehensive transform tests
+├── test_load.py            # Comprehensive load tests
+├── test_extract_simple.py  # Simple extract integration test
+├── test_transform_simple.py # Simple transform integration test
+└── test_load_simple.py     # Simple load integration test
+```
+
+### Test Coverage
+
+- **Extract Module**: File validation, CSV parsing, error handling
+- **Transform Module**: Data cleaning, validation, business logic
+- **Load Module**: Database operations, connection handling
+- **Integration Tests**: End-to-end pipeline testing
+
+### Test Features
+
+- **Comprehensive Coverage**: Tests all major functions and edge cases
+- **Mock Database**: Uses SQLite for testing when MySQL unavailable
+- **Error Scenarios**: Tests file not found, invalid data, connection failures
+- **Data Validation**: Tests email validation, customer ID validation, business logic
+- **Detailed Logging**: Test output includes detailed logging for debugging
+
+## 🔍 Data Validation
+
+### Customer Data Validation
+- **Email Format Validation**: Strict regex validation requiring proper domain extensions (`.com`, `.org`, `.net`, etc.)
+- **Unique Constraints**: Ensures unique customer IDs and emails
+- **Date Validation**: Validates join dates and removes invalid entries
+- **Duplicate Removal**: Removes duplicate entries based on ID and email
+- **Data Type Validation**: Ensures proper data types for all fields
+
+### Order Data Validation
+- **Customer Reference Validation**: Validates customer ID references against customers table
+- **Business Logic Validation**: 
+  - Ensures positive total amounts
+  - Validates order dates (not in future, not too old)
+  - Removes invalid customer references
+- **Data Type Validation**: Ensures proper numeric and date formats
+- **Cross-Reference Validation**: Only orders with valid customer IDs are processed
+
+## ⚙️ Configuration
+
+### ETL Configuration (`config/etl_config.json`)
+
+```json
+{
+    "data_paths": {
+        "customers": "data/customers.csv",
+        "orders": "data/orders.csv"
+    },
+    "validation": {
+        "max_order_age_years": 10,
+        "min_total_amount": 0.01,
+        "email_validation": true
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "etl.log",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    },
+    "database": {
+        "backup_before_replace": true,
+        "create_tables_if_not_exist": true
+    }
+}
+```
+
+## 🛡️ Error Handling
+
+The pipeline includes comprehensive error handling:
+
+- **File Validation**: Checks file existence and readability
+- **Data Validation**: Validates CSV structure and data types
+- **Database Validation**: Tests database connections and table structures
+- **Business Logic Validation**: Applies domain-specific rules
+- **Logging**: Detailed logging to both file and console
+- **Graceful Degradation**: Continues processing even if some data is invalid
+- **Fallback Options**: SQLite fallback when MySQL is unavailable
+
+## 📊 Logging
+
+Logs are written to:
+- Console output for real-time monitoring
+- `etl.log` file for persistent records
+
+Log levels:
+- `INFO`: Normal operations
+- `WARNING`: Non-critical issues
+- `ERROR`: Critical failures
+
+Example log output:
+```
+2025-08-06 04:24:58,286 - INFO - Starting ETL pipeline
+2025-08-06 04:24:58,289 - INFO - Successfully extracted 2 rows from data/customers.csv
+2025-08-06 04:24:58,303 - INFO - Final cleaned customers: 1 rows (from 2)
+2025-08-06 04:24:58,520 - INFO - Successfully loaded 1 rows to customers
+```
 
 ## 🗄️ Database Schema
 
 ### Customers Table
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INT | Primary key, auto-increment |
-| `name` | VARCHAR(255) | Customer full name |
-| `email` | VARCHAR(255) | Customer email address (lowercase) |
-| `join_date` | DATETIME | Customer registration date |
+```sql
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    join_date DATETIME NOT NULL
+);
+```
 
 ### Orders Table
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INT | Primary key, auto-increment |
-| `customer_id` | INT | Foreign key to customers.id |
-| `order_date` | DATETIME | Date of order placement |
-| `total_amount` | DECIMAL(10,2) | Order total amount |
+```sql
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATETIME NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+```
 
-### Relationships
-- `orders.customer_id` → `customers.id` (Foreign Key)
-
-## 🔧 Data Processing
+## 🔧 Data Processing Details
 
 ### Extract Phase
-- Reads CSV files from the `data/` directory
-- Handles file reading errors gracefully
-- Provides detailed logging of extraction results
+- **File Validation**: Checks file existence, readability, and CSV structure
+- **Error Handling**: Graceful handling of missing files, empty files, and parsing errors
+- **Logging**: Detailed extraction statistics and error reporting
 
 ### Transform Phase
 - **Customer Data Cleaning**:
-  - Removes rows with missing email addresses
-  - Standardizes email addresses (lowercase, trimmed)
-  - Converts join dates to proper datetime format
-  - Removes invalid date entries
-
+  - Email format validation with strict regex patterns
+  - Duplicate removal (ID and email uniqueness)
+  - Date validation and conversion
+  - Name field cleaning and validation
 - **Order Data Cleaning**:
-  - Converts order dates to datetime format
-  - Removes orders with missing dates or amounts
-  - Ensures total_amount is numeric
-  - Validates customer_id references
+  - Customer ID cross-reference validation
+  - Business logic validation (positive amounts, valid dates)
+  - Data type conversion and validation
+  - Invalid data filtering
 
 ### Load Phase
-- Creates tables if they don't exist
-- Replaces existing data (if_exists='replace')
-- Provides detailed loading status feedback
+- **Database Connection**: Secure connection with fallback options
+- **Table Management**: Automatic table creation with proper schema
+- **Data Loading**: Efficient bulk loading with error handling
+- **Backup Capability**: Optional table backup before replacement
 
 ## 🧪 Testing
 
-Run the test suite to verify pipeline functionality:
+### Running Tests
+
+The project includes comprehensive unit tests organized in the `tests/` directory:
+
 ```bash
-python test_extract.py
-python test_transform.py
-python test_load.py
+# Run all tests with beautiful summary
+python tests/run_tests.py
+
+# Run specific test modules
+python -m unittest tests.test_extract
+python -m unittest tests.test_transform
+python -m unittest tests.test_load
 ```
 
-## 📊 Expected Data Format
+### Test Structure
 
-### customers.csv
-```csv
-id,name,email,join_date
-1,John Doe,john@example.com,2023-01-15
-2,Jane Smith,jane@example.com,2023-02-20
+```
+tests/
+├── __init__.py              # Tests package
+├── run_tests.py             # Test runner with summary
+├── test_extract.py          # Comprehensive extract tests
+├── test_transform.py        # Comprehensive transform tests
+└── test_load.py            # Comprehensive load tests
 ```
 
-### orders.csv
-```csv
-id,customer_id,order_date,total_amount
-1,1,2023-03-10,150.00
-2,2,2023-03-15,75.50
+### Test Coverage
+
+- **Extract Module**: File validation, CSV parsing, error handling
+- **Transform Module**: Data cleaning, validation, business logic
+- **Load Module**: Database operations, connection handling
+
+### Test Features
+
+- **Comprehensive Coverage**: Tests all major functions and edge cases
+- **Mock Database**: Uses SQLite for testing when MySQL unavailable
+- **Error Scenarios**: Tests file not found, invalid data, connection failures
+- **Data Validation**: Tests email validation, customer ID validation, business logic
+- **Detailed Logging**: Test output includes detailed logging for debugging
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Failed**
+   - Check `config/db_config.json` settings
+   - Ensure MySQL server is running
+   - Verify database exists
+   - Pipeline will fallback to SQLite for testing
+
+2. **File Not Found**
+   - Check file paths in configuration
+   - Ensure CSV files exist in data directory
+   - Verify file permissions
+
+3. **Data Validation Errors**
+   - Check CSV file structure
+   - Verify data types and formats
+   - Review log files for specific errors
+   - Invalid emails will be filtered out automatically
+
+4. **Invalid Customer References**
+   - Orders with invalid customer IDs are automatically filtered
+   - Check customer data quality in source files
+
+### Log Analysis
+
+Check `etl.log` for detailed error information:
+```bash
+# Windows
+type etl.log
+
+# Linux/Mac
+tail -f etl.log
 ```
 
-## 🔮 Future Improvements
+## 📈 Performance Features
 
-### Planned Enhancements
-- [ ] **Incremental Loading**: Support for delta updates instead of full table replacement
-- [ ] **Data Validation**: Schema validation and data quality checks
-- [ ] **Logging**: Comprehensive logging with configurable levels
-- [ ] **Error Recovery**: Resume capability for failed pipeline runs
-- [ ] **Monitoring**: Dashboard for pipeline health and performance metrics
-- [ ] **Scheduling**: Integration with cron or Airflow for automated runs
-- [ ] **Data Lineage**: Track data transformations and dependencies
-- [ ] **Backup Strategy**: Automated database backups before ETL runs
+- **Efficient Data Processing**: Optimized pandas operations
+- **Connection Pooling**: Database connection management
+- **Batch Processing**: Handles large datasets efficiently
+- **Memory Management**: Proper resource cleanup
+- **Error Recovery**: Continues processing despite individual record failures
 
-### Technical Improvements
-- [ ] **Async Processing**: Implement async/await for better performance
-- [ ] **Batch Processing**: Process large datasets in chunks
-- [ ] **Connection Pooling**: Optimize database connections
-- [ ] **Configuration Management**: Environment-specific configurations
+## 🔮 Future Enhancements
+
+### Planned Features
+- [ ] **Incremental Loading**: Delta updates instead of full replacement
+- [ ] **Data Lineage**: Track data transformations
+- [ ] **Monitoring Dashboard**: Real-time pipeline health metrics
+- [ ] **Scheduling**: Automated pipeline execution
 - [ ] **Docker Support**: Containerized deployment
 - [ ] **CI/CD Integration**: Automated testing and deployment
+
+### Technical Improvements
+- [ ] **Async Processing**: Better performance for large datasets
+- [ ] **Configuration Management**: Environment-specific settings
+- [ ] **Advanced Logging**: Structured logging with correlation IDs
+- [ ] **Metrics Collection**: Performance and quality metrics
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
 
 ### Development Guidelines
 - Follow PEP 8 style guidelines
-- Add comprehensive docstrings to functions
+- Add comprehensive docstrings
 - Include unit tests for new features
-- Update documentation for any API changes
+- Update documentation for API changes
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-- **Project Maintainer**: Ian Dave Cruz
-- **Email**: cdave,dev@gmail.com
-- **GitHub**: @N-Dave-08
-
-## 🙏 Acknowledgments
-
-- Built with [Pandas](https://pandas.pydata.org/) for data manipulation
-- Powered by [SQLAlchemy](https://www.sqlalchemy.org/) for database operations
-- MySQL connectivity provided by [PyMySQL](https://pymysql.readthedocs.io/)
+This project is licensed under the MIT License.
 
 ---
 
-**Note**: This ETL pipeline is designed for educational and development purposes. For production use, consider implementing additional security measures, error handling, and monitoring capabilities.
+**Note**: This ETL pipeline is production-ready with comprehensive error handling, data validation, and logging. It automatically filters out invalid data (like malformed emails or invalid customer references) while providing detailed feedback on the processing results.

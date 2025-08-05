@@ -31,10 +31,18 @@ def get_db_config():
         password = config.get('password', '')
         db_url = f"mysql+pymysql://{config['user']}:{password}@{config['host']}/{config['database']}"
         
-        # Create engine without testing connection immediately
+        # Create engine and test connection
         engine = create_engine(db_url)
-        logger.info(f"Created database engine for: {config['database']}")
-        return engine
+        
+        # Test the connection immediately
+        try:
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            logger.info(f"Created database engine for: {config['database']}")
+            return engine
+        except Exception as e:
+            logger.warning(f"MySQL connection failed: {e}")
+            return None
         
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in database config: {e}")
@@ -99,9 +107,21 @@ def create_table_if_not_exists(engine, table_name: str, df: pd.DataFrame):
     """
     try:
         with engine.connect() as conn:
-            # Check if table exists
-            result = conn.execute(text(f"SHOW TABLES LIKE '{table_name}'"))
-            if not result.fetchone():
+            # Check if table exists - handle both MySQL and SQLite
+            try:
+                # Try MySQL syntax first
+                result = conn.execute(text(f"SHOW TABLES LIKE '{table_name}'"))
+                table_exists = result.fetchone() is not None
+            except Exception:
+                # Fallback to SQLite syntax
+                try:
+                    result = conn.execute(text(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"))
+                    table_exists = result.fetchone() is not None
+                except Exception:
+                    # If both fail, assume table doesn't exist
+                    table_exists = False
+            
+            if not table_exists:
                 logger.info(f"Creating table {table_name}")
                 
                 # Create table based on dataframe structure
